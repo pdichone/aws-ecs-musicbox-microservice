@@ -15,7 +15,7 @@ Also as ENV VAR you can specify the port on which the service listens on, **PORT
 You can find the docker containers for the services on DockerHub:
 
 * [musicboxapp container](https://hub.docker.com/repository/docker/pauloclouddev/musicboxapp)
-* [flamencoapp container](https://hub.docker.com/repository/docker/pauloclouddev/flamencolapp)
+* [flamencoapp container](https://hub.docker.com/repository/docker/pauloclouddev/flamencoapp)
 * [operaapp container](https://hub.docker.com/repository/docker/pauloclouddev/operaapp)
 
 ## Usage
