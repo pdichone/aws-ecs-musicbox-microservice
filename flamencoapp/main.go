@@ -10,7 +10,7 @@ import (
 )
 
 const defaultPort = "9001"
-const defaultArtists = "Motörhead, Metallica"
+const defaultArtists = "Paco de Lucia, Estrella Morente"
 const defaultStage = "dev"
 
 func getServerPort() string {
@@ -37,7 +37,7 @@ func getXRAYAppName() string {
 		return appName
 	}
 
-	return "metal"
+	return "flamenco"
 }
 
 func getStage() string {
@@ -49,24 +49,24 @@ func getStage() string {
 	return defaultStage
 }
 
-type metalHandler struct{}
+type flamencoHandler struct{}
 
-func (h *metalHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	log.Println("metal artists requested, responding with", getArtists())
+func (h *flamencoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	log.Println("flamenco artists requested, responding with", getArtists())
 	fmt.Fprint(writer, getArtists())
 }
 
 type pingHandler struct{}
 
 func (h *pingHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	log.Println("ping to metal-svc requested, responding with HTTP 200")
+	log.Println("ping to flamenco-svc requested, responding with HTTP 200")
 	writer.WriteHeader(http.StatusOK)
 }
 
 func main() {
 	log.Println("starting server, listening on port " + getServerPort())
 	xraySegmentNamer := xray.NewFixedSegmentNamer(getXRAYAppName())
-	http.Handle("/", xray.Handler(xraySegmentNamer, &metalHandler{}))
+	http.Handle("/", xray.Handler(xraySegmentNamer, &flamencoHandler{}))
 	http.Handle("/ping", xray.Handler(xraySegmentNamer, &pingHandler{}))
 	http.ListenAndServe(":"+getServerPort(), nil)
 }

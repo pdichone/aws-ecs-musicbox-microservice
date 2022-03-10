@@ -40,46 +40,46 @@ func getXRAYAppName() string {
 		return appName
 	}
 
-	return "jukebox-front"
+	return "musicbox-front"
 }
 
-func getMetalEndpoint() (string, error) {
-	metalEndpoint := os.Getenv("METAL_HOST")
-	if metalEndpoint == "" {
-		return "", errors.New("METAL_HOST is not set")
+func getFlamencoEndpoint() (string, error) {
+	flamecoEndpoint := os.Getenv("FLAMENCO_HOST")
+	if flamecoEndpoint == "" {
+		return "", errors.New("FLAMENCO_HOST is not set")
 	}
-	return metalEndpoint, nil
+	return flamecoEndpoint, nil
 }
 
-func getPopEndpoint() (string, error) {
-	popEndpoint := os.Getenv("POP_HOST")
-	if popEndpoint == "" {
-		return "", errors.New("POP_HOST is not set")
+func getOperaEndpoint() (string, error) {
+	operaEndpoint := os.Getenv("OPERA_HOST")
+	if operaEndpoint == "" {
+		return "", errors.New("OPERA_HOST is not set")
 	}
-	return popEndpoint, nil
+	return operaEndpoint, nil
 }
 
-type metalHandler struct{}
+type flamencoHandler struct{}
 
-func (h *metalHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	artists, err := getMetalArtists(request)
+func (h *flamencoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	artists, err := getFlamencoArtists(request)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("500 - Unexpected Error"))
 		return
 	}
 
-	fmt.Fprintf(writer, `{"metal artists":"%s"}`, artists)
+	fmt.Fprintf(writer, `{"flamenco artists":"%s"}`, artists)
 }
 
-func getMetalArtists(request *http.Request) (string, error) {
-	metalEndpoint, err := getMetalEndpoint()
+func getFlamencoArtists(request *http.Request) (string, error) {
+	flamencoEndpoint, err := getFlamencoEndpoint()
 	if err != nil {
 		return "-n/a-", err
 	}
 
 	client := xray.Client(&http.Client{})
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s", metalEndpoint), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s", flamencoEndpoint), nil)
 	if err != nil {
 		return "-n/a-", err
 	}
@@ -95,34 +95,34 @@ func getMetalArtists(request *http.Request) (string, error) {
 		return "-n/a-", err
 	}
 
-	metalArtists := strings.TrimSpace(string(body))
-	if len(metalArtists) < 1 {
-		return "-n/a-", errors.New("Empty response from metalArtists")
+	flamencoArtists := strings.TrimSpace(string(body))
+	if len(flamencoArtists) < 1 {
+		return "-n/a-", errors.New("Empty response from flamencoArtists")
 	}
 
-	return metalArtists, nil
+	return flamencoArtists, nil
 }
 
-type popHandler struct{}
+type operaHandler struct{}
 
-func (h *popHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	artists, err := getPopArtists(request)
+func (h *operaHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	artists, err := getOperaArtists(request)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		writer.Write([]byte("500 - Unexpected Error"))
 		return
 	}
 
-	fmt.Fprintf(writer, `{"pop artists":"%s"}`, artists)
+	fmt.Fprintf(writer, `{"Opera artists":"%s"}`, artists)
 }
-func getPopArtists(request *http.Request) (string, error) {
-	popEndpoint, err := getPopEndpoint()
+func getOperaArtists(request *http.Request) (string, error) {
+	operaEndpoint, err := getOperaEndpoint()
 	if err != nil {
 		return "-n/a-", err
 	}
 
 	client := xray.Client(&http.Client{})
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s", popEndpoint), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s", operaEndpoint), nil)
 	if err != nil {
 		return "-n/a-", err
 	}
@@ -138,12 +138,12 @@ func getPopArtists(request *http.Request) (string, error) {
 		return "-n/a-", err
 	}
 
-	popArtists := strings.TrimSpace(string(body))
-	if len(popArtists) < 1 {
-		return "-n/a-", errors.New("Empty response from popArtists")
+	operaArtists := strings.TrimSpace(string(body))
+	if len(operaArtists) < 1 {
+		return "-n/a-", errors.New("Empty response from operaArtists")
 	}
 
-	return popArtists, nil
+	return operaArtists, nil
 }
 
 type pingHandler struct{}
@@ -158,22 +158,22 @@ func main() {
 
 	xray.SetLogger(xraylog.NewDefaultLogger(os.Stderr, xraylog.LogLevelInfo))
 
-	metalEndpoint, err := getMetalEndpoint()
+	flamecoEndpoint, err := getFlamencoEndpoint()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	popEndpoint, err := getPopEndpoint()
+	operaEndpoint, err := getOperaEndpoint()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	log.Println("Using -metal- service at " + metalEndpoint)
-	log.Println("Using -pop- service at " + popEndpoint)
+	log.Println("Using -flamenco- service at " + flamecoEndpoint)
+	log.Println("Using -opera- service at " + operaEndpoint)
 
 	xraySegmentNamer := xray.NewFixedSegmentNamer(getXRAYAppName())
 
-	http.Handle("/metal", xray.Handler(xraySegmentNamer, &metalHandler{}))
-	http.Handle("/pop", xray.Handler(xraySegmentNamer, &popHandler{}))
+	http.Handle("/flamenco", xray.Handler(xraySegmentNamer, &flamencoHandler{}))
+	http.Handle("/opera", xray.Handler(xraySegmentNamer, &operaHandler{}))
 	http.Handle("/ping", xray.Handler(xraySegmentNamer, &pingHandler{}))
 	log.Fatal(http.ListenAndServe(":"+getServerPort(), nil))
 }

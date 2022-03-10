@@ -14,10 +14,10 @@ RUN go env -w GOPROXY=${GO_PROXY}
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /metalapp .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /flamencoapp .
 
 FROM amazonlinux:2
 RUN yum install -y ca-certificates
-COPY --from=builder /metalapp /bin/metalapp
+COPY --from=builder /flamencoapp /bin/flamencoapp
 
-ENTRYPOINT ["/bin/metalapp"]
+ENTRYPOINT ["/bin/flamencoapp"]

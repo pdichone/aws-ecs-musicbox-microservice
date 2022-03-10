@@ -14,10 +14,10 @@ RUN go env -w GOPROXY=${GO_PROXY}
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /popapp .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /operaapp .
 
 FROM amazonlinux:2
 RUN yum install -y ca-certificates
-COPY --from=builder /popapp /bin/popapp
+COPY --from=builder /operaapp /bin/operaapp
 
-ENTRYPOINT ["/bin/popapp"]
+ENTRYPOINT ["/bin/operaapp"]

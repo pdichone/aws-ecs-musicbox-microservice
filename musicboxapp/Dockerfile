@@ -16,10 +16,10 @@ RUN go env -w GOPROXY=${GO_PROXY}
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /jukeboxapp .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /musicboxapp .
 
 FROM amazonlinux:2
 RUN yum install -y ca-certificates
-COPY --from=builder /jukeboxapp /bin/jukeboxapp
+COPY --from=builder /musicboxapp /bin/musicboxapp
 
-ENTRYPOINT ["/bin/jukeboxapp"]
+ENTRYPOINT ["/bin/musicboxapp"]
